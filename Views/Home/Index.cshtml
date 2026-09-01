@@ -1,0 +1,79 @@
+@model PhotoDescriber.Models.PhotoResultViewModel
+@{
+    ViewData["Title"] = "Photo Describer";
+    Layout = "_Layout";
+}
+
+<header class="hero">
+    <p class="eyebrow">CivicTechSolutions Cognitive Services &middot; Computer Vision</p>
+    <h1>Photo Describer</h1>
+    <p class="lede">Upload a photo. The Computer Vision API reads it back to you &mdash; a caption, a confidence reading, and the tags it noticed.</p>
+</header>
+
+<section class="darkroom-card">
+    <form asp-controller="Home" asp-action="Upload" method="post" enctype="multipart/form-data" class="upload-form">
+        <label for="photo" class="file-drop">
+            <span class="file-drop-icon">&#9678;</span>
+            <span class="file-drop-text">
+                <strong>Choose a photo to analyze</strong>
+                <span id="file-name">JPG, PNG, GIF, BMP or WEBP &middot; up to 4&nbsp;MB</span>
+            </span>
+            <input type="file" id="photo" name="photo" accept=".jpg,.jpeg,.png,.gif,.bmp,.webp" required
+                   onchange="document.getElementById('file-name').innerText = this.files.length ? this.files[0].name : 'JPG, PNG, GIF, BMP or WEBP · up to 4 MB'" />
+        </label>
+
+        <button type="submit" class="btn-primary">Upload &amp; Describe</button>
+    </form>
+
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert-error" role="alert">@Model.ErrorMessage</div>
+    }
+
+    @if (Model.HasResult)
+    {
+        <div class="result">
+            <div class="result-photo">
+                <img src="@Model.ImageUrl" alt="Uploaded photo" />
+                @if (Model.ServedFromCache)
+                {
+                    <span class="badge-cache" title="This exact image was analyzed before, so the cached result was reused instead of calling the API again.">FROM CACHE</span>
+                }
+            </div>
+
+            <div class="result-details">
+                <p class="result-eyebrow">Description</p>
+                <p class="result-caption">&ldquo;@Model.Analysis!.PrimaryDescription&rdquo;</p>
+
+                <div class="exposure-meter" title="Confidence">
+                    <div class="exposure-meter-fill" style="width:@(Model.Analysis!.PrimaryConfidencePercentage)%"></div>
+                </div>
+                <p class="exposure-reading">@Model.Analysis!.PrimaryConfidencePercentage% confidence</p>
+
+                @if (Model.Analysis!.AllCaptions.Count > 1)
+                {
+                    <details class="alt-captions">
+                        <summary>Other captions considered</summary>
+                        <ul>
+                            @foreach (var caption in Model.Analysis!.AllCaptions.Skip(1))
+                            {
+                                <li>&ldquo;@caption.Text&rdquo; &mdash; @caption.ConfidencePercentage%</li>
+                            }
+                        </ul>
+                    </details>
+                }
+
+                @if (Model.Analysis!.Tags.Any())
+                {
+                    <p class="result-eyebrow tags-eyebrow">Tags detected</p>
+                    <ul class="tag-list">
+                        @foreach (var tag in Model.Analysis!.Tags)
+                        {
+                            <li>@tag</li>
+                        }
+                    </ul>
+                }
+            </div>
+        </div>
+    }
+</section>

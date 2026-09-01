@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>PhotoDescriber</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Azure Blob Storage SDK: used for Requirement 3 (Store the Image in Blob Storage) -->
+    <PackageReference Include="Azure.Storage.Blobs" Version="12.22.0" />
+  </ItemGroup>
+
+</Project>
